@@ -17,22 +17,27 @@ int main(int argc, char* argv[]){
 
     if ( strcmp(argv[1],"-i") == 0 )
     {
-        // TO DO
+        int age = atoi(argv[3]);
+        new_person(argv[2], age);
     }
 
     if ( strcmp(argv[1],"-l") == 0 )
     {
-        // TO DO
+        int N = atoi(argv[2]);
+        list_n_persons(N);
     }
 
     if ( strcmp(argv[1],"-u") == 0 )
     {
-        // TO DO
+        int age = atoi(argv[3]);
+        person_change_age(argv[2], age);
     }
 
     if ( strcmp(argv[1],"-o") == 0 )
     {
-        // TO DO
+        int position = atoi(argv[2]);
+        int age = atoi(argv[3]);
+        person_change_age_v2(position, age);
     }
 
     return 0;
