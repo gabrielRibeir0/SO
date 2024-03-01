@@ -6,8 +6,13 @@ int new_person(char *name, int age){
     strcpy(p.name, name);
 
     int fd = open(FILENAME, O_CREAT | O_WRONLY, 0664); //ou int fd = open(FILENAME, O_CREAT | O_APPEND, 0664); e não é preciso lseek()
-    lseek(fd, 0, SEEK_END);
+    off_t offset = lseek(fd, 0, SEEK_END);
     write(fd, &p, sizeof(Person));
+
+    int n = offset / sizeof(Person) + 1;
+    char output[25];
+    int output_size = sprintf(output, "Registo %d\n", n);
+    write(1, output, output_size);
 
     close(fd);
     return 0;

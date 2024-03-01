@@ -1,16 +1,20 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int main(){
-    pid_t parent, child;
+    pid_t child;
+    int status;
 
     if((child = fork()) == 0){
-        printf("ID processo filho: %d\n", child);
+        printf("Filho: ID processo pai: %d ID processo filho: %d\n", getppid(), getpid());
         _exit(0);
     }
     else{
-        parent = getpid();
-        printf("ID processo pai: %d\nID processo filho (pai imprime): %d\n", parent, child);
+        pid_t terminated_pid = wait(&status);
+        if(WIFEXITED(status)) {
+            printf("Pai: ID processo pai: %d ID processo filho: %d Status:%d\n", getppid(), getpid(), WEXITSTATUS(status));
+        }
     }
 
     return 0;
