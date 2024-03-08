@@ -6,8 +6,7 @@
 
 #define MAX_RAND 100
 #define ROWS 10
-#define COLUMNS 10
-
+#define COLUMNS 1000
 
 
 int **createMatrix();

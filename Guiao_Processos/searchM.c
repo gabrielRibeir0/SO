@@ -1,6 +1,5 @@
 #include "matrix.h"
 
-
 int main(int argc, char *argv[]) {
 
     // generate random matrix
@@ -9,7 +8,11 @@ int main(int argc, char *argv[]) {
     // print matrix
     printMatrix(matrix);
 
-    // TO DO
+    if(argc > 1) {
+        int value = atoi(argv[1]);
+        valueExists(matrix, value);
+        linesWithValue(matrix, value);
+    }
 
     // free matrix
     for (int i = 0; i < ROWS; i++) {
