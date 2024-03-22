@@ -1,11 +1,9 @@
 #include "mysystem.h"
 
-
 // recebe um comando por argumento
 // returna -1 se o fork falhar
 // caso contrario retorna o valor do comando executado
 int mysystem(const char* command) {
-
 	int fork_ret, exec_ret, status;
 	int res = -1;
 
@@ -28,24 +26,20 @@ int mysystem(const char* command) {
 		case -1:
 			res=-1;
 			break;
-		
 		case 0: //processo filho
 			exec_ret = execvp(exec_args[0], exec_args);
 			perror("erro no exec");
 			_exit(exec_ret);
-			break;
-		
 		default:
 			wait(&status);
-			if(WIFEXITED(status)==255){
-				res=-1;
+			if(WIFEXITED(status)){
+                res = WEXITSTATUS(status);
 			}
 			else{
-				res = WEXITSTATUS(status);
+				res = -1;
 			}
 			break;
 	}
-	
 
 	return res;
 }
