@@ -58,18 +58,20 @@ void lookupNumber(int** matrix, int value, int* vector){
         }
     }
 
+    close(p[1]);
+    Minfo info;
+    ssize_t read_bytes;
+    while((read_bytes = read(p[0], &info, sizeof(Minfo))) > 0) {
+        vector[info.line_nr] = info.ocur_nr;
+        //printf("Pai: o filho encontrou o valor %d vezes na linha %d\n", info.ocur_nr, info.line_nr);
+    }
+    close(p[0]);
+
+
     for(int i = 0; i < ROWS; i++){
-        close(p[1]);
-        Minfo info;
-        ssize_t read_bytes;
-        while((read_bytes = read(p[0], &info, sizeof(Minfo))) > 0) {
-            printf("Pai: o filho encontrou o valor %d vezes na linha %d\n", info.ocur_nr, info.line_nr);
-        }
-        close(p[0]);
         pid_t terminated_pid = wait(&status);
         if(WIFEXITED(status)){
             printf("Pai: o filho %d terminou com status %d\n", terminated_pid, WEXITSTATUS(status));
         }
     }
-
 }
