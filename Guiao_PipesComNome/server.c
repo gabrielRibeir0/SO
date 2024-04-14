@@ -13,24 +13,50 @@ int main (int argc, char * argv[]){
 	init_vector();
 	print_vector();
 
-    int fd = mkfifo("FIFO_MATRIX", 0666);
-    if(fd == -1){
-        perror("Erro ao criar o FIFO");
+    if(mkfifo(SERVER, 0666) == -1){
+        perror("Erro ao criar o FIFO do servidor");
         return -1;
     }
 
-    fd = open("FIFO_MATRIX", O_RDWR);
-    if(fd == -1){
-        perror("Erro na abertura do FIFO");
+    int server_fifo_read = open(SERVER, O_RDONLY);
+    if(server_fifo_read == -1){
+        perror("Erro na abertura do FIFO do servidor (leitura)");
         return -1;
     }
 
-    int value, count;
+    //para manter o servidor sempre a ler de vários clientes, abrimos aqui em escrita para ter sempre alguém com a escrita aberta (não vai deixar o ciclo while terminar)
+    int server_fifo_write = open(SERVER, O_WRONLY);
+    if(server_fifo_write == -1){
+        perror("Erro na abertura do FIFO do servidor (escrita)");
+        return -1;
+    }
+
+    Msg message;
     ssize_t read_bytes;
-    while ((read_bytes = read(fd, &value, sizeof(int)))> 0){
-        count = count_needle(value);
-        write(fd, &count, sizeof(int));
+    while ((read_bytes = read(server_fifo_read, &message, sizeof(Msg)))> 0){
+        //se o valor de procura enviado para o cliente for -1, ver como código para encerrar o servidor
+        if(message.needle == -1){
+            printf("A fechar o servidor...\n");
+            close(server_fifo_write);
+        }
+        else{
+            message.occurrences = count_needle(message.needle);
+        }
+
+        char fifo_name[20];
+        sprintf(fifo_name, "%s%d", CLIENT, message.pid);
+        int client_fifo = open(fifo_name, O_WRONLY);
+        if(client_fifo == -1){
+            perror("Erro na abertura do FIFO do cliente");
+            continue;
+        }
+
+        write(client_fifo, &message, sizeof(Msg));
+        close(client_fifo);
     }
-	
+
+    close(server_fifo_read);
+    unlink(SERVER);
+
 	return 0;
 }
