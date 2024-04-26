@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "defs.h"
-#include <time.h>
 
 int main (int argc, char * argv[]){
 
