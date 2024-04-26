@@ -30,10 +30,10 @@ int exec_command(char* arg){
 	}
 
 	exec_args[i]=NULL;
-	
+
 	exec_ret=execvp(exec_args[0],exec_args);
-	
-	return exec_ret;
+
+    return exec_ret;
 }
 
 
@@ -49,19 +49,12 @@ int main(int argc, char** argv){
 	};
 
     int pipes[number_of_commands-1][2];
-    /*for(int i=0;i<number_of_commands-1;i++){
-        pipe(pipes[i]);
-    }*/
 
     pid_t pid;
     for(int i = 0; i < number_of_commands; i++){
-        if(i != number_of_commands-1) {
-            pipe(pipes[i]);
-        }
+        pipe(pipes[i]);
         pid = fork();
         if(pid == 0){
-            int in_original = dup(0);
-            int out_original = dup(1);
             if(i == 0){
                 dup2(pipes[i][1],1);
             }
@@ -72,23 +65,28 @@ int main(int argc, char** argv){
                 dup2(pipes[i-1][0],0);
                 dup2(pipes[i][1],1);
             }
-            for(int j = 0; j < number_of_commands-1; j++){
-                close(pipes[j][0]);
-                //close(pipes[j][1]);
-            }
-            //close(pipes[i][0]);
+
             exec_command(commands[i]);
-            //close(pipes[i][1]);
-            dup2(in_original,0);
-            dup2(out_original,1);
+
             _exit(0);
+        }
+        else{
+            if(i == 0){
+                close(pipes[i][1]);
+            }
+            else if(i == number_of_commands-1){
+                close(pipes[i-1][0]);
+            }
+            else{
+                close(pipes[i-1][0]);
+                close(pipes[i][1]);
+            }
         }
     }
 
-    for(int i = 0; i < number_of_commands-1; i++){
-        wait(NULL);
+    for(int i = 0; i < number_of_commands; i++){
+        pid_t pid_term = wait(NULL);
     }
 
 	return 0;
 }
-
